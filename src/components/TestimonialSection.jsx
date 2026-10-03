@@ -1,13 +1,14 @@
 "use client";
 
+import { useId } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 
 import "swiper/css";
-import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-const testimonials = [
+const defaultTestimonials = [
   {
     name: "Rajesh Sharma",
     location: "Delhi",
@@ -46,91 +47,121 @@ const testimonials = [
   },
 ];
 
-export default function TestimonialsSection() {
+const themes = {
+  red: {
+    badge: "bg-red-100 text-red-600",
+    avatar: "from-red-600 to-red-700",
+    quote: "text-red-100",
+    hover: "hover:bg-red-600 hover:border-red-600",
+    bullet: "#dc2626",
+    bg: "from-white via-red-50/40 to-white",
+  },
+  blue: {
+    badge: "bg-blue-100 text-blue-800",
+    avatar: "from-blue-800 to-blue-950",
+    quote: "text-blue-100",
+    hover: "hover:bg-blue-900 hover:border-blue-900",
+    bullet: "#1e3a8a",
+    bg: "from-white via-blue-50/50 to-white",
+  },
+};
+
+export default function TestimonialsSection({
+  testimonials = defaultTestimonials,
+  badge = "Customer Reviews",
+  title = "What Our Customers Say",
+  subtitle = "Trusted by families across India for quality, purity and taste.",
+  theme = "red",
+}) {
+  const t = themes[theme] ?? themes.red;
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const prevClass = `t-prev-${uid}`;
+  const nextClass = `t-next-${uid}`;
+
   return (
-    <section className="py-10 bg-gradient-to-b from-white via-red-50/40 to-white overflow-hidden">
-      <div className="max-w-[1600px] mx-auto px-4">
+    <section className={`py-16 md:py-20 bg-linear-to-b ${t.bg} overflow-hidden`}>
+      <div className="max-w-7xl mx-auto px-4">
 
         {/* Header */}
-        <div className="text-center mb-16">
-          <span className="inline-flex items-center px-4 py-2 rounded-full bg-red-100 text-red-600 text-sm font-semibold">
-            Customer Reviews
-          </span>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="max-w-2xl">
+            <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${t.badge}`}>
+              {badge}
+            </span>
 
-          <h2 className="mt-5 text-3xl md:text-5xl font-bold text-gray-900">
-            What Our Customers Say
-          </h2>
+            <h2 className="mt-5 text-3xl md:text-5xl font-bold text-gray-900">
+              {title}
+            </h2>
 
-          <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-            Trusted by families across India for quality, purity and taste.
-          </p>
+            <p className="mt-4 text-gray-600">{subtitle}</p>
+          </div>
+
+          {/* Arrows */}
+          <div className="flex gap-3">
+            <button
+              aria-label="Previous testimonial"
+              className={`${prevClass} w-12 h-12 rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm flex items-center justify-center hover:text-white transition-all duration-300 ${t.hover}`}
+            >
+              <ChevronLeft size={22} />
+            </button>
+            <button
+              aria-label="Next testimonial"
+              className={`${nextClass} w-12 h-12 rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm flex items-center justify-center hover:text-white transition-all duration-300 ${t.hover}`}
+            >
+              <ChevronRight size={22} />
+            </button>
+          </div>
         </div>
 
         <Swiper
           modules={[Autoplay, Navigation, Pagination]}
-          navigation
+          navigation={{ prevEl: `.${prevClass}`, nextEl: `.${nextClass}` }}
           pagination={{ clickable: true }}
           autoplay={{
-            delay: 4000,
+            delay: 4500,
             disableOnInteraction: false,
+            pauseOnMouseEnter: true,
           }}
+          loop={testimonials.length > 3}
           spaceBetween={24}
           breakpoints={{
-            0: {
-              slidesPerView: 1,
-            },
-            640: {
-              slidesPerView: 1,
-            },
-            768: {
-              slidesPerView: 2,
-            },
-            1024: {
-              slidesPerView: 3,
-            },
-            1400: {
-              slidesPerView: 4,
-            },
+            0: { slidesPerView: 1 },
+            768: { slidesPerView: 2 },
+            1024: { slidesPerView: 3 },
           }}
-          className="testimonial-slider pb-14"
+          className="testimonial-slider pb-14! px-1! pt-2!"
+          style={{ "--bullet-active": t.bullet }}
         >
           {testimonials.map((item, index) => (
-            <SwiperSlide key={index}>
-              <div className="h-[420px] bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 flex flex-col">
+            <SwiperSlide key={index} className="h-auto!">
+              <div className="relative h-full bg-white rounded-3xl p-8 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.15)] hover:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.25)] hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col">
 
-                {/* Quote */}
-                <div className="mb-5">
-                  <svg
-                    className="w-12 h-12 text-red-100"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M9.983 3v7.391C9.983 15.097 6.831 18.57 2 21l-1.188-2.815c2.851-1.65 4.523-3.744 5.016-6.282H2V3h7.983zm13 0v7.391c0 4.706-3.152 8.179-7.983 10.609l-1.188-2.815c2.851-1.65 4.523-3.744 5.016-6.282H15V3h7.983z" />
-                  </svg>
-                </div>
+                <Quote
+                  className={`absolute top-6 right-6 w-14 h-14 ${t.quote}`}
+                  fill="currentColor"
+                  strokeWidth={0}
+                />
 
                 {/* Rating */}
                 <div className="flex gap-1 mb-6">
                   {[...Array(5)].map((_, i) => (
-                    <span
+                    <Star
                       key={i}
-                      className="text-yellow-400 text-lg"
-                    >
-                      ★
-                    </span>
+                      size={18}
+                      className="text-amber-400"
+                      fill="currentColor"
+                    />
                   ))}
                 </div>
 
                 {/* Review */}
-                <div className="flex-1">
-                  <p className="text-gray-600 text-lg leading-8">
-                    "{item.review}"
-                  </p>
-                </div>
+                <p className="flex-1 text-gray-600 text-base md:text-lg leading-8">
+                  &ldquo;{item.review}&rdquo;
+                </p>
 
                 {/* Customer */}
-                <div className="pt-6 border-t border-gray-100 flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-red-600 to-red-700 text-white flex items-center justify-center font-bold text-xl flex-shrink-0">
+                <div className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-4">
+                  <div className={`w-14 h-14 rounded-full bg-linear-to-br ${t.avatar} text-white flex items-center justify-center font-bold text-xl shrink-0`}>
                     {item.name.charAt(0)}
                   </div>
 
@@ -138,10 +169,7 @@ export default function TestimonialsSection() {
                     <h4 className="font-bold text-gray-900 text-lg">
                       {item.name}
                     </h4>
-
-                    <p className="text-gray-500">
-                      {item.location}
-                    </p>
+                    <p className="text-gray-500 text-sm">{item.location}</p>
                   </div>
                 </div>
 
@@ -158,35 +186,13 @@ export default function TestimonialsSection() {
           height: 10px;
           background: #d1d5db;
           opacity: 1;
+          transition: all 0.3s;
         }
 
         .testimonial-slider .swiper-pagination-bullet-active {
-          background: #dc2626;
-          width: 26px;
+          background: var(--bullet-active, #dc2626);
+          width: 28px;
           border-radius: 9999px;
-        }
-
-        .testimonial-slider .swiper-button-prev,
-        .testimonial-slider .swiper-button-next {
-          width: 50px;
-          height: 50px;
-          border-radius: 9999px;
-          background: white;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-          color: #dc2626;
-        }
-
-        .testimonial-slider .swiper-button-prev:after,
-        .testimonial-slider .swiper-button-next:after {
-          font-size: 18px;
-          font-weight: 700;
-        }
-
-        @media (max-width: 768px) {
-          .testimonial-slider .swiper-button-prev,
-          .testimonial-slider .swiper-button-next {
-            display: none;
-          }
         }
       `}</style>
     </section>
